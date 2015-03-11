@@ -8,6 +8,13 @@ namespace csharpncurses
 	{
 		const string cursesLib = "libncurses.so.5.9";
 
+		public static int AddChar(uint ch)
+		{
+			int result = addch(ch);
+			InternalException.Verify(result, "AddChar");
+			return result;
+		}
+
 		public static int AddStr(string stringToAdd)
 		{
 			int ret = addstr(stringToAdd);
@@ -19,6 +26,24 @@ namespace csharpncurses
 		{
 			int result = assume_default_colors(f, b);
 			InternalException.Verify(result, "AssumeDefaultColors");
+		}
+
+		public static void AttributeOff(uint attributes)
+		{
+			int result = attroff(attributes);
+			InternalException.Verify(result, "AttributeOff");
+		}
+
+		public static void AttributeOn(uint attributes)
+		{
+			int result = attron(attributes);
+			InternalException.Verify(result, "AttributeOn");
+		}
+
+		public static void AttributeSet(uint attributes)
+		{
+			int result = attrset(attributes);
+			InternalException.Verify(result, "AttributeSet");
 		}
 
 		public static void Background(uint ch)
@@ -77,6 +102,13 @@ namespace csharpncurses
 			return isendwin();
 		}
 
+		public static int NapMilliseconds(int milliseconds)
+		{
+			int result = napms(milliseconds);
+			InternalException.Verify(result, "NapMilliseconds");
+			return result;
+		}
+
 		public static void PairContent(short pair, out short fg, out short bg)
 		{
 			int result = pair_content(pair, out fg, out bg);
@@ -118,6 +150,18 @@ namespace csharpncurses
 		[DllImport(cursesLib)]
 		private static extern int assume_default_colors(int f, int b);
 
+		[DllImport(cursesLib)]
+		private static extern int attroff(uint attributes);
+
+		[DllImport(cursesLib)]
+		private static extern int attron(uint attributes);
+
+		[DllImport(cursesLib)]
+		private static extern int attrset(uint attributes);
+
+		[DllImport(cursesLib)]
+		private static extern int addch(uint ch);
+
 		[DllImport(cursesLib, CharSet = CharSet.Ansi)]
 		private static extern int addstr(String str);
 
@@ -150,6 +194,9 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern Boolean isendwin();
+
+		[DllImport(cursesLib)]
+		private static extern int napms(int milliseconds);
 
 		[DllImport(cursesLib)]
 		private static extern int pair_content(short pair, out short fg, out short bg);
