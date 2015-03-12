@@ -1,5 +1,6 @@
 ﻿using System;
 using csharpncurses;
+using System.Text;
 
 namespace cursesTest
 {
@@ -7,10 +8,16 @@ namespace cursesTest
 	{
 		public static void Main(string[] args)
 		{
-			IntPtr stdscr = NCurses.InitScreen();
-			NCurses.AddStr("Hello NCurses C#!");
+			StringBuilder first = new StringBuilder(24);
+			NCurses.InitScreen();
+
+			NCurses.AddStr("What is your first name? ");
 			NCurses.Refresh();
-			NCurses.GetCh();
+			NCurses.GetString(first);
+
+			NCurses.AddStr(string.Format("Pleased to meet you {0}", first));
+			NCurses.Refresh();
+			NCurses.GetChar();
 
 			NCurses.EndWin();
 		}

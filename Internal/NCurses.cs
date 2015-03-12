@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace csharpncurses
 {
@@ -74,9 +75,23 @@ namespace csharpncurses
 			InternalException.Verify(ret, "EndWin");
 		}
 
-		public static int GetCh()
+		public static char GetChar()
 		{
-			return getch();
+			int result = getch();
+			InternalException.Verify(result, "GetChar");
+			return (char)result;
+		}
+
+		public static void GetNString(StringBuilder message, int numberOfCharacters)
+		{
+			int result = getnstr(message, numberOfCharacters);
+			InternalException.Verify(result, "GetNString");
+		}
+
+		public static void GetString(StringBuilder message)
+		{
+			int result = getstr(message);
+			InternalException.Verify(result, "Getstring");
 		}
 
 		public static bool HasColors()
@@ -102,6 +117,13 @@ namespace csharpncurses
 			return isendwin();
 		}
 
+		public static int Move(int row, int column)
+		{
+			int result = move(row, column);
+			InternalException.Verify(result, "Move");
+			return result;
+		}
+
 		public static int NapMilliseconds(int milliseconds)
 		{
 			int result = napms(milliseconds);
@@ -119,6 +141,7 @@ namespace csharpncurses
 		{
 			return PAIR_NUMBER(pairNumber);
 		}
+
 
 		public static int Refresh()
 		{
@@ -181,6 +204,12 @@ namespace csharpncurses
 		private static extern int getch();
 
 		[DllImport(cursesLib)]
+		private static extern int getnstr(StringBuilder message, int numberOfCharacters);
+
+		[DllImport(cursesLib)]
+		private static extern int getstr(StringBuilder message);
+
+		[DllImport(cursesLib)]
 		private static extern Boolean has_colors();
 
 		[DllImport(cursesLib)]
@@ -194,6 +223,9 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern Boolean isendwin();
+
+		[DllImport(cursesLib)]
+		private static extern int move(int row, int column);
 
 		[DllImport(cursesLib)]
 		private static extern int napms(int milliseconds);
