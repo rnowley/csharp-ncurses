@@ -4,6 +4,39 @@ using System.Text;
 
 namespace csharpncurses
 {
+	public enum NCursesColor: short
+	{
+		BLACK = 0,
+		RED	= 1,
+		GREEN = 2,
+		YELLOW = 3,
+		BLUE = 4,
+		MAGENTA	= 5,
+		CYAN = 6,
+		WHITE = 7
+	}
+
+	public enum NCursesAttribute: uint
+	{
+		NORMAL = 0,
+		BOLD = 2097152,
+		UNDERLINE = 131072,
+		ATTRIBUTES = 4294967040,
+		CHAR_TEXT = 255,
+		REVERSE = 262144,
+		BLINK = 524288,
+		DIM = 1048576,
+		ALT_CHARSET = 4194304,
+		INVIS = 8388608,
+		PROTECT = 16777216,
+		HORIZONTAL = 33554432,
+		LEFT = 67108864,
+		LOW = 134217728,
+		RIGHT = 268435456,
+		TOP = 536870912,
+		VERTICAL = 1073741824,
+		ITALIC = 2147483648
+	}
 
 	public static class NCurses
 	{
@@ -105,6 +138,13 @@ namespace csharpncurses
 			InternalException.Verify(result, "InitColor");
 		}
 
+		public static int InitPair(short color, short foreground, short background)
+		{
+			int result = init_pair(color, foreground, background);
+			InternalException.Verify(result, "InitPair");
+			return result;
+		}
+
 		public static IntPtr InitScreen()
 		{
 			IntPtr ret = initscr();
@@ -142,6 +182,11 @@ namespace csharpncurses
 			return PAIR_NUMBER(pairNumber);
 		}
 
+		public static void StartColor()
+		{
+			int result = start_color();
+			InternalException.Verify(result, "StartColour");
+		}
 
 		public static int Refresh()
 		{
@@ -189,6 +234,9 @@ namespace csharpncurses
 		private static extern int addstr(String str);
 
 		[DllImport(cursesLib)]
+		private static extern int beep();
+
+		[DllImport(cursesLib)]
 		private static extern int bkgd(uint ch);
 
 		[DllImport(cursesLib)]
@@ -199,6 +247,9 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int endwin();
+
+		[DllImport(cursesLib)]
+		private static extern int flash();
 
 		[DllImport(cursesLib)]
 		private static extern int getch();

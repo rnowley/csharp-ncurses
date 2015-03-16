@@ -1,5 +1,6 @@
 ﻿using System;
 using csharpncurses;
+using csharpncurses.NCurses;
 using System.Text;
 
 namespace cursesTest
@@ -8,18 +9,37 @@ namespace cursesTest
 	{
 		public static void Main(string[] args)
 		{
-			StringBuilder first = new StringBuilder(24);
-			NCurses.InitScreen();
+			InitScreen();
 
-			NCurses.AddStr("What is your first name? ");
-			NCurses.Refresh();
-			NCurses.GetString(first);
+			StartColor();
+			InitPair(1, (short)NCursesColor.WHITE, (short)NCursesColor.BLUE);
+			InitPair(2, (short)NCursesColor.GREEN, (short)NCursesColor.WHITE);
+			InitPair(3, (short)NCursesColor.RED, (short)NCursesColor.GREEN);
+			Background(ColorPair(1));
+			AddStr("I think I shall never see\n");
+			AddStr("A colour screen as pretty as thee.\n");
+			AddStr("For seasons may change\n");
+			AddStr("and storms may thunder;\n");
+			AddStr("But colour text shall always wonder.");
 
-			NCurses.AddStr(string.Format("Pleased to meet you {0}", first));
-			NCurses.Refresh();
-			NCurses.GetChar();
+			Refresh();
+			GetChar();
 
+			Background(ColorPair(2));
+			Refresh();
+			GetChar();
+
+			Background(ColorPair(3));
+			Refresh();
+			GetChar();
+
+			EndWin();
+		}
+
+		private static void Bomb(string message)
+		{
 			NCurses.EndWin();
+			Console.WriteLine(message);
 		}
 	}
 }
