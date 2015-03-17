@@ -9,37 +9,30 @@ namespace cursesTest
 	{
 		public static void Main(string[] args)
 		{
-			InitScreen();
 
-			StartColor();
-			InitPair(1, (short)NCursesColor.WHITE, (short)NCursesColor.BLUE);
-			InitPair(2, (short)NCursesColor.GREEN, (short)NCursesColor.WHITE);
-			InitPair(3, (short)NCursesColor.RED, (short)NCursesColor.GREEN);
-			Background(ColorPair(1));
-			AddStr("I think I shall never see\n");
-			AddStr("A colour screen as pretty as thee.\n");
-			AddStr("For seasons may change\n");
-			AddStr("and storms may thunder;\n");
-			AddStr("But colour text shall always wonder.");
+			var s = InitScreen();
 
-			Refresh();
-			GetChar();
-
-			Background(ColorPair(2));
-			Refresh();
-			GetChar();
-
-			Background(ColorPair(3));
-			Refresh();
+			Centre(s, 1, "Penguin Football Finals");
+			Centre(s, 5, "Cattle Dung Samples from Temecula");
+			Centre(s, 7, "Catatonic Theater");
+			Centre(s, 9, "Why Do Ions Hate Each Other?");
 			GetChar();
 
 			EndWin();
 		}
 
-		private static void Bomb(string message)
+		private static void Centre(IntPtr standardScreen, int row, string title)
 		{
-			NCurses.EndWin();
-			Console.WriteLine(message);
+			int y;
+			int width;
+			int indent;
+
+			GetMaxYX(standardScreen, out y, out width);
+			indent = width - title.Length;
+			indent /= 2;
+
+			MoveAddString(row, indent, title);
+			Refresh();
 		}
 	}
 }

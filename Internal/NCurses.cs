@@ -86,6 +86,12 @@ namespace csharpncurses
 			InternalException.Verify(result, "Background");
 		}
 
+		public static void Beep()
+		{
+			int result = beep();
+			InternalException.Verify(result, "Beep");
+		}
+
 		public static bool CanChangeColor()
 		{
 			return can_change_color();
@@ -108,11 +114,25 @@ namespace csharpncurses
 			InternalException.Verify(ret, "EndWin");
 		}
 
+		public static void Flash()
+		{
+			int result = flash();
+			InternalException.Verify(result, "Flash");
+		}
+
 		public static char GetChar()
 		{
 			int result = getch();
 			InternalException.Verify(result, "GetChar");
 			return (char)result;
+		}
+
+		public static void GetMaxYX(IntPtr window, out int y, out int x)
+		{
+			y = getmaxy(window);
+			InternalException.Verify(y, "GetMaxYX");
+			x = getmaxx(window);
+			InternalException.Verify(x, "GetMaxYX");
 		}
 
 		public static void GetNString(StringBuilder message, int numberOfCharacters)
@@ -157,10 +177,24 @@ namespace csharpncurses
 			return isendwin();
 		}
 
-		public static int Move(int row, int column)
+		public static int Move(int y, int x)
 		{
-			int result = move(row, column);
+			int result = move(y, x);
 			InternalException.Verify(result, "Move");
+			return result;
+		}
+
+		public static int MoveAddCharacter(int y, int x, uint character)
+		{
+			int result = mvaddch(y, x, character);
+			InternalException.Verify(result, "MoveAddCharacter");
+			return result;
+		}
+
+		public static int MoveAddString(int y, int x, string message)
+		{
+			int result = mvaddstr(y, x, message);
+			InternalException.Verify(result, "MoveAddString");
 			return result;
 		}
 
@@ -255,6 +289,12 @@ namespace csharpncurses
 		private static extern int getch();
 
 		[DllImport(cursesLib)]
+		private static extern int getmaxx(IntPtr window);
+
+		[DllImport(cursesLib)]
+		private static extern int getmaxy(IntPtr window);
+
+		[DllImport(cursesLib)]
 		private static extern int getnstr(StringBuilder message, int numberOfCharacters);
 
 		[DllImport(cursesLib)]
@@ -276,7 +316,22 @@ namespace csharpncurses
 		private static extern Boolean isendwin();
 
 		[DllImport(cursesLib)]
-		private static extern int move(int row, int column);
+		private static extern int move(int y, int x);
+
+		[DllImport(cursesLib)]
+		private static extern int mvaddch(int row, int column, uint character);
+
+		[DllImport(cursesLib)]
+		private static extern int mvaddchnstr(int row, int column, uint character, int numberOfCharacters);
+
+		[DllImport(cursesLib)]
+		private static extern int mvaddchstr(int row, int column, uint character);
+
+		[DllImport(cursesLib)]
+		private static extern int mvaddnstr(int row, int column, uint character, int numberOfCharacters);
+
+		[DllImport(cursesLib)]
+		private static extern int mvaddstr(int row, int column, string message);
 
 		[DllImport(cursesLib)]
 		private static extern int napms(int milliseconds);
