@@ -10,29 +10,39 @@ namespace cursesTest
 		public static void Main(string[] args)
 		{
 
-			var s = InitScreen();
+			var stdscr = InitScreen();
 
-			Centre(s, 1, "Penguin Football Finals");
-			Centre(s, 5, "Cattle Dung Samples from Temecula");
-			Centre(s, 7, "Catatonic Theater");
-			Centre(s, 9, "Why Do Ions Hate Each Other?");
-			GetChar();
+			AddStr("Press any key to end this program:");
+
+			while(!KbHit(stdscr)) {
+			}
+
 
 			EndWin();
 		}
 
-		private static void Centre(IntPtr standardScreen, int row, string title)
+		private static bool KbHit(IntPtr window)
 		{
-			int y;
-			int width;
-			int indent;
+			int character;
+			bool r;
 
-			GetMaxYX(standardScreen, out y, out width);
-			indent = width - title.Length;
-			indent /= 2;
+			NoDelay(window, true);
+			NoEcho();
 
-			MoveAddString(row, indent, title);
-			Refresh();
+			character = GetChar();
+
+			if(character == (int)NCursesStatus.ERROR) {
+				r = false;
+			}
+			else {
+				r = true;
+				UngetChar(character);
+			}
+
+			Echo();
+			NoDelay(window, false);
+			return r;
 		}
+
 	}
 }

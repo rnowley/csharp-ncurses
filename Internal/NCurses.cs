@@ -4,6 +4,12 @@ using System.Text;
 
 namespace csharpncurses
 {
+	public enum NCursesStatus: int
+	{
+		ERROR = -1,
+		OK = 1
+	}
+
 	public enum NCursesColor: short
 	{
 		BLACK = 0,
@@ -97,6 +103,24 @@ namespace csharpncurses
 			return can_change_color();
 		}
 
+		public static void Clear()
+		{
+			int result = clear();
+			InternalException.Verify(result, "Clear");
+		}
+
+		public static void ClearToEndOfLine()
+		{
+			int result = clrtoeol();
+			InternalException.Verify(result, "ClearToEndOfLine");
+		}
+
+		public static void ClearToBottom()
+		{
+			int result = clrtobot();
+			InternalException.Verify(result, "ClearToBottom");
+		}
+
 		public static void ColorContent(short color, out short red, out short green, out short blue)
 		{
 			int result = color_content(color, out red, out green, out blue);
@@ -108,10 +132,34 @@ namespace csharpncurses
 			return COLOR_PAIR(pairNumber);
 		}
 
+		public static void DeleteCharacter()
+		{
+			int result = delch();
+			InternalException.Verify(result, "DeleteCharacter");
+		}
+
+		public static void DeleteLine()
+		{
+			int result = deleteln();
+			InternalException.Verify(result, "DeleteLine");
+		}
+
+		public static void Echo()
+		{
+			int result = echo();
+			InternalException.Verify(result, "Echo");
+		}
+
 		public static void EndWin()
 		{
 			int ret = endwin();
 			InternalException.Verify(ret, "EndWin");
+		}
+
+		public static void Erase()
+		{
+			int result = erase();
+			InternalException.Verify(result, "Erase");
 		}
 
 		public static void Flash()
@@ -120,11 +168,16 @@ namespace csharpncurses
 			InternalException.Verify(result, "Flash");
 		}
 
-		public static char GetChar()
+		public static void FlushInputBuffer()
+		{
+			int result = flushinp();
+			InternalException.Verify(result, "FlushInputBuffer");
+		}
+
+		public static int GetChar()
 		{
 			int result = getch();
-			InternalException.Verify(result, "GetChar");
-			return (char)result;
+			return result;
 		}
 
 		public static void GetMaxYX(IntPtr window, out int y, out int x)
@@ -145,6 +198,14 @@ namespace csharpncurses
 		{
 			int result = getstr(message);
 			InternalException.Verify(result, "Getstring");
+		}
+
+		public static void GetYX(IntPtr window, out int y, out int x)
+		{
+			y = getcury(window);
+			InternalException.Verify(y, "GetYX");
+			x = getcurx(window);
+			InternalException.Verify(x, "GetYX");
 		}
 
 		public static bool HasColors()
@@ -170,6 +231,18 @@ namespace csharpncurses
 			IntPtr ret = initscr();
 			InternalException.Verify(ret, "InitScreen");
 			return ret;
+		}
+
+		public static void InsertCharacter(uint character)
+		{
+			int result = insch(character);
+			InternalException.Verify(result, "InsertCharacter");
+		}
+
+		public static void InsertLine()
+		{
+			int result = insertln();
+			InternalException.Verify(result, "InsertLine");
 		}
 
 		public static bool IsEndWin()
@@ -205,6 +278,18 @@ namespace csharpncurses
 			return result;
 		}
 
+		public static void NoDelay(IntPtr window, bool removeDelay)
+		{
+			int result = nodelay(window, removeDelay);
+			InternalException.Verify(result, "NoDelay");
+		}
+
+		public static void NoEcho()
+		{
+			int result = noecho();
+			InternalException.Verify(result, "NoEcho");
+		}
+
 		public static void PairContent(short pair, out short fg, out short bg)
 		{
 			int result = pair_content(pair, out fg, out bg);
@@ -233,6 +318,11 @@ namespace csharpncurses
 		{
 			int ret = resize_term(numberOfLines, numberOfColumns);
 			InternalException.Verify(ret, "ResizeTerminal");
+		}
+
+		public static int UngetChar(int character)
+		{
+			return ungetch(character);
 		}
 
 		public static void UseDefaultColors()
@@ -277,16 +367,46 @@ namespace csharpncurses
 		private static extern Boolean can_change_color();
 
 		[DllImport(cursesLib)]
+		private static extern int clear();
+
+		[DllImport(cursesLib)]
 		private static extern int color_content(short color, out short red, out short green, out short blue);
+
+		[DllImport(cursesLib)]
+		private static extern int clrtobot();
+
+		[DllImport(cursesLib)]
+		private static extern int clrtoeol();
+
+		[DllImport(cursesLib)]
+		private static extern int delch();
+
+		[DllImport(cursesLib)]
+		private static extern int deleteln();
+
+		[DllImport(cursesLib)]
+		private static extern int echo();
 
 		[DllImport(cursesLib)]
 		private static extern int endwin();
 
 		[DllImport(cursesLib)]
+		private static extern int erase();
+
+		[DllImport(cursesLib)]
 		private static extern int flash();
 
 		[DllImport(cursesLib)]
+		private static extern int flushinp();
+
+		[DllImport(cursesLib)]
 		private static extern int getch();
+
+		[DllImport(cursesLib)]
+		private static extern int getcurx(IntPtr window);
+
+		[DllImport(cursesLib)]
+		private static extern int getcury(IntPtr window);
 
 		[DllImport(cursesLib)]
 		private static extern int getmaxx(IntPtr window);
@@ -313,6 +433,12 @@ namespace csharpncurses
 		private static extern int init_pair(short color, short fg, short bg);
 
 		[DllImport(cursesLib)]
+		private static extern int insch(uint character);
+
+		[DllImport(cursesLib)]
+		private static extern int insertln();
+
+		[DllImport(cursesLib)]
 		private static extern Boolean isendwin();
 
 		[DllImport(cursesLib)]
@@ -337,6 +463,12 @@ namespace csharpncurses
 		private static extern int napms(int milliseconds);
 
 		[DllImport(cursesLib)]
+		private static extern int nodelay(IntPtr window, bool removeDelay);
+
+		[DllImport(cursesLib)]
+		private static extern int noecho();
+
+		[DllImport(cursesLib)]
 		private static extern int pair_content(short pair, out short fg, out short bg);
 
 		[DllImport(cursesLib)]
@@ -347,6 +479,9 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int start_color();
+
+		[DllImport(cursesLib)]
+		private static extern int ungetch(int character);
 
 		[DllImport(cursesLib)]
 		private static extern int use_default_colors();
