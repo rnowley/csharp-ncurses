@@ -10,16 +10,51 @@ namespace csharpncurses
 		OK = 1
 	}
 
+	public enum KeyCodes: int
+	{
+		KEY_CODE_YES = 256,
+		KEY_MIN,
+		KEY_BREAK = 257,
+		KEY_DOWN,
+		KEY_UP,
+		KEY_LEFT,
+		KEY_RIGHT,
+		KEY_HOME,
+		KEY_BACKSPACE,
+		KEY_F0,
+		KEY_F1,
+		KEY_F2,
+		KEY_F3,
+		KEY_F4,
+		KEY_F5,
+		KEY_F6,
+		KEY_F7,
+		KEY_F8,
+		KEY_F9,
+		KEY_F10,
+		KEY_F11,
+		KEY_F12,
+		// Delete-line key
+		KEY_DL = 328,
+		// Insert-line key
+		KEY_IL,
+		KEY_DC,
+		KEY_IC,
+		KEY_EIC,
+		KEY_CLEAR,
+		KEY_EOS
+	}
+
 	public enum NCursesColor: short
 	{
 		BLACK = 0,
-		RED	= 1,
-		GREEN = 2,
-		YELLOW = 3,
-		BLUE = 4,
-		MAGENTA	= 5,
-		CYAN = 6,
-		WHITE = 7
+		RED,
+		GREEN,
+		YELLOW,
+		BLUE,
+		MAGENTA,
+		CYAN,
+		WHITE
 	}
 
 	public enum NCursesAttribute: uint
@@ -48,7 +83,7 @@ namespace csharpncurses
 	{
 		const string cursesLib = "libncurses.so.5.9";
 
-		public static int AddChar(uint ch)
+		public static int AddChar(int ch)
 		{
 			int result = addch(ch);
 			InternalException.Verify(result, "AddChar");
@@ -142,6 +177,12 @@ namespace csharpncurses
 		{
 			int result = deleteln();
 			InternalException.Verify(result, "DeleteLine");
+		}
+
+		public static void DeleteWindow(IntPtr window)
+		{
+			int result = delwin(window);
+			InternalException.Verify(result, "DeleteWindow");
 		}
 
 		public static void Echo()
@@ -250,6 +291,12 @@ namespace csharpncurses
 			return isendwin();
 		}
 
+		public static void Keypad(IntPtr window, bool enable)
+		{
+			int result = keypad(window, enable);
+			InternalException.Verify(result, "Keypad");
+		}
+
 		public static int Move(int y, int x)
 		{
 			int result = move(y, x);
@@ -271,10 +318,24 @@ namespace csharpncurses
 			return result;
 		}
 
+		public static int MoveWAddString(IntPtr window, int y, int x, string message)
+		{
+			int result = mvwaddstr(window, y, x, message);
+			InternalException.Verify(result, "MoveWAddString");
+			return result;
+		}
+
 		public static int NapMilliseconds(int milliseconds)
 		{
 			int result = napms(milliseconds);
 			InternalException.Verify(result, "NapMilliseconds");
+			return result;
+		}
+
+		public static IntPtr NewWindow(int rows, int columns, int yOrigin, int xOrigin)
+		{
+			IntPtr result = newwin(rows, columns, yOrigin, xOrigin);
+			InternalException.Verify(result, "NewWindow");
 			return result;
 		}
 
@@ -320,6 +381,13 @@ namespace csharpncurses
 			InternalException.Verify(ret, "ResizeTerminal");
 		}
 
+		public static int TouchWindow(IntPtr window)
+		{
+			int result = touchwin(window);
+			InternalException.Verify(result, "TouchWindow");
+			return result;
+		}
+
 		public static int UngetChar(int character)
 		{
 			return ungetch(character);
@@ -329,6 +397,26 @@ namespace csharpncurses
 		{
 			int result = use_default_colors();
 			InternalException.Verify(result, "UseDefaultColors");
+		}
+
+		public static int WAddStr(IntPtr window, string message)
+		{
+			int result = waddstr(window, message);
+			InternalException.Verify(result, "WAddStr");
+			return result;
+		}
+
+		public static void WindowBackground(IntPtr window, uint ch)
+		{
+			int result = wbkgd(window, ch);
+			InternalException.Verify(result, "WindowBackground");
+		}
+
+		public static int WRefresh(IntPtr window)
+		{
+			int result = wrefresh(window);
+			InternalException.Verify(result, "WRefresh");
+			return result;
 		}
 
 		// ------------------------------------
@@ -343,6 +431,12 @@ namespace csharpncurses
 		private static extern int assume_default_colors(int f, int b);
 
 		[DllImport(cursesLib)]
+		private static extern int addch(int ch);
+
+		[DllImport(cursesLib, CharSet = CharSet.Ansi)]
+		private static extern int addstr(String str);
+
+		[DllImport(cursesLib)]
 		private static extern int attroff(uint attributes);
 
 		[DllImport(cursesLib)]
@@ -350,12 +444,6 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int attrset(uint attributes);
-
-		[DllImport(cursesLib)]
-		private static extern int addch(uint ch);
-
-		[DllImport(cursesLib, CharSet = CharSet.Ansi)]
-		private static extern int addstr(String str);
 
 		[DllImport(cursesLib)]
 		private static extern int beep();
@@ -383,6 +471,9 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int deleteln();
+
+		[DllImport(cursesLib)]
+		private static extern int delwin(IntPtr window);
 
 		[DllImport(cursesLib)]
 		private static extern int echo();
@@ -442,6 +533,9 @@ namespace csharpncurses
 		private static extern Boolean isendwin();
 
 		[DllImport(cursesLib)]
+		private static extern int keypad(IntPtr window, bool enable);
+
+		[DllImport(cursesLib)]
 		private static extern int move(int y, int x);
 
 		[DllImport(cursesLib)]
@@ -460,7 +554,13 @@ namespace csharpncurses
 		private static extern int mvaddstr(int row, int column, string message);
 
 		[DllImport(cursesLib)]
+		private static extern int mvwaddstr(IntPtr window, int y, int x, string message);
+
+		[DllImport(cursesLib)]
 		private static extern int napms(int milliseconds);
+
+		[DllImport(cursesLib)]
+		private static extern IntPtr newwin(int rows, int columns, int yOrigin, int xOrigin);
 
 		[DllImport(cursesLib)]
 		private static extern int nodelay(IntPtr window, bool removeDelay);
@@ -481,16 +581,25 @@ namespace csharpncurses
 		private static extern int start_color();
 
 		[DllImport(cursesLib)]
+		private static extern int touchwin(IntPtr window);
+
+		[DllImport(cursesLib)]
 		private static extern int ungetch(int character);
 
 		[DllImport(cursesLib)]
 		private static extern int use_default_colors();
 
 		[DllImport(cursesLib, CharSet = CharSet.Ansi)]
+		private static extern int waddstr(IntPtr window, string message);
+
+		[DllImport(cursesLib, CharSet = CharSet.Ansi)]
 		private static extern int waddnstr(IntPtr win, String str, int n);
 
 		[DllImport(cursesLib)]
 		private static extern int wrefresh(IntPtr win);
+
+		[DllImport(cursesLib)]
+		private static extern int wbkgd(IntPtr window, uint ch);
 
 	}
 }

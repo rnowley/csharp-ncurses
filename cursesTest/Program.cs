@@ -1,47 +1,70 @@
 ﻿using System;
 using csharpncurses;
-using csharpncurses.NCurses;
 using System.Text;
 
 namespace cursesTest
 {
 	class MainClass
 	{
+
 		public static void Main(string[] args)
-		{
+		{ 
+			IntPtr a = IntPtr.Zero, b = IntPtr.Zero, c = IntPtr.Zero, d = IntPtr.Zero, stdscr;
+			int maxX, maxY, halfX, halfY;
 
-			var stdscr = InitScreen();
+			stdscr = NCurses.InitScreen();
 
-			AddStr("Press any key to end this program:");
+			NCurses.GetMaxYX(stdscr, out maxY, out maxX);
+			halfX = maxX >> 1;
+			halfY = maxY >> 1;
 
-			while(!KbHit(stdscr)) {
+			try {
+				a = NCurses.NewWindow(halfY, halfX, 0, 0);
+			}
+			catch(InternalException) {
+				Bomb();
 			}
 
+			try {
+				b = NCurses.NewWindow(halfY, halfX, 0, halfX);
+			}
+			catch(InternalException) {
+				Bomb();
+			}
 
-			EndWin();
+			try {
+				c = NCurses.NewWindow(halfY, halfX, halfY, 0);
+			}
+			catch(InternalException) {
+				Bomb();
+			}
+
+			try {
+				d = NCurses.NewWindow(halfY, halfX, halfY, halfX);
+			}
+			catch(InternalException) {
+				Bomb();
+			}
+
+			NCurses.MoveWAddString(a, 0, 0, "This is window A\n");
+			NCurses.WRefresh(a);
+			NCurses.MoveWAddString(b, 0, 0, "This is window B\n");
+			NCurses.WRefresh(b);
+			NCurses.MoveWAddString(c, 0, 0, "This is window C\n");
+			NCurses.WRefresh(c);
+			NCurses.MoveWAddString(d, 0, 0, "This is window D\n");
+			NCurses.WRefresh(d);
+
+			NCurses.NapMilliseconds(5000);
+
+			NCurses.EndWin();
 		}
 
-		private static bool KbHit(IntPtr window)
+		private static void Bomb()
 		{
-			int character;
-			bool r;
-
-			NoDelay(window, true);
-			NoEcho();
-
-			character = GetChar();
-
-			if(character == (int)NCursesStatus.ERROR) {
-				r = false;
-			}
-			else {
-				r = true;
-				UngetChar(character);
-			}
-
-			Echo();
-			NoDelay(window, false);
-			return r;
+			NCurses.AddStr("Unable to allocate memory for the new window.\n");
+			NCurses.Refresh();
+			NCurses.EndWin();
 		}
 
 	}
