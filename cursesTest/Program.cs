@@ -9,63 +9,48 @@ namespace cursesTest
 
 		public static void Main(string[] args)
 		{ 
-			IntPtr a = IntPtr.Zero, b = IntPtr.Zero, c = IntPtr.Zero, d = IntPtr.Zero, stdscr;
-			int maxX, maxY, halfX, halfY;
+			IntPtr grandpa = IntPtr.Zero;
+			IntPtr father = IntPtr.Zero;
+			IntPtr boy = IntPtr.Zero;
 
-			stdscr = NCurses.InitScreen();
+			int maxX;
+			int maxY;
+
+			IntPtr stdscr = NCurses.InitScreen();
+			NCurses.StartColor();
+			NCurses.InitPair((short)1, (short)NCursesColor.WHITE, (short)NCursesColor.BLUE);
+			NCurses.InitPair(2, (short)NCursesColor.RED, (short)NCursesColor.YELLOW);
+			NCurses.InitPair(3, (short)NCursesColor.CYAN, (short)NCursesColor.WHITE);
 
 			NCurses.GetMaxYX(stdscr, out maxY, out maxX);
-			halfX = maxX >> 1;
-			halfY = maxY >> 1;
 
 			try {
-				a = NCurses.NewWindow(halfY, halfX, 0, 0);
+				grandpa = NCurses.NewWindow(maxY - 4, maxX - 10, 2, 5);
+				father = NCurses.SubWindow(grandpa, maxY - 8, maxX - 20, 4, 10);
+				boy = NCurses.SubWindow(father, maxY - 16, maxX - 40, 8, 20);
 			}
 			catch(InternalException) {
-				Bomb();
+				NCurses.AddStr("Unable to create subwindow\n");
+				NCurses.EndWin();
 			}
 
-			try {
-				b = NCurses.NewWindow(halfY, halfX, 0, halfX);
-			}
-			catch(InternalException) {
-				Bomb();
-			}
+			NCurses.WindowBackground(grandpa, NCurses.ColorPair(1));
+			NCurses.WAddStr(grandpa, "Grandpa");
+			NCurses.WindowBackground(father, NCurses.ColorPair(2));
+			NCurses.WAddStr(father, "Father");
+			NCurses.WindowBackground(boy, NCurses.ColorPair(3));
+			NCurses.WAddStr(boy, "Boy");
+			NCurses.WRefresh(grandpa);
+			NCurses.WGetChar(grandpa);
 
-			try {
-				c = NCurses.NewWindow(halfY, halfX, halfY, 0);
-			}
-			catch(InternalException) {
-				Bomb();
-			}
-
-			try {
-				d = NCurses.NewWindow(halfY, halfX, halfY, halfX);
-			}
-			catch(InternalException) {
-				Bomb();
-			}
-
-			NCurses.MoveWAddString(a, 0, 0, "This is window A\n");
-			NCurses.WRefresh(a);
-			NCurses.MoveWAddString(b, 0, 0, "This is window B\n");
-			NCurses.WRefresh(b);
-			NCurses.MoveWAddString(c, 0, 0, "This is window C\n");
-			NCurses.WRefresh(c);
-			NCurses.MoveWAddString(d, 0, 0, "This is window D\n");
-			NCurses.WRefresh(d);
-
-			NCurses.NapMilliseconds(5000);
+			NCurses.DeleteWindow(boy);
+			NCurses.ClearWindow(father);
+			NCurses.WAddStr(father, "Bye, son!\n");
+			NCurses.WRefresh(father);
+			NCurses.WGetChar(grandpa);
 
 			NCurses.EndWin();
 		}
-
-		private static void Bomb()
-		{
-			NCurses.AddStr("Unable to allocate memory for the new window.\n");
-			NCurses.Refresh();
-			NCurses.EndWin();
-		}
-
+			
 	}
 }

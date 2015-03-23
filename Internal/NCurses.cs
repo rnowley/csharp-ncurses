@@ -156,6 +156,12 @@ namespace csharpncurses
 			InternalException.Verify(result, "ClearToBottom");
 		}
 
+		public static void ClearWindow(IntPtr window)
+		{
+			int result = wclear(window);
+			InternalException.Verify(result, "ClearWindow");
+		}
+
 		public static void ColorContent(short color, out short red, out short green, out short blue)
 		{
 			int result = color_content(color, out red, out green, out blue);
@@ -165,6 +171,14 @@ namespace csharpncurses
 		public static uint ColorPair(int pairNumber)
 		{
 			return COLOR_PAIR(pairNumber);
+		}
+
+		public static void CopyWindow(IntPtr sourceWindow, IntPtr destinationWindow, int sourceRow, int sourceColumn,
+		                              int destinationRow, int destinationColumn, int dxRow, int dxColumn, int type)
+		{
+			int result = copywin(sourceWindow, destinationWindow, sourceRow, sourceColumn, destinationRow,
+				             destinationColumn, dxRow, dxColumn, type);
+			InternalException.Verify(result, "CopyWindow");
 		}
 
 		public static void DeleteCharacter()
@@ -183,6 +197,20 @@ namespace csharpncurses
 		{
 			int result = delwin(window);
 			InternalException.Verify(result, "DeleteWindow");
+		}
+
+		public static IntPtr DerWindow(IntPtr window, int rows, int columns, int y, int x)
+		{
+			IntPtr result = derwin(window, rows, columns, y, x);
+			InternalException.Verify(result, "DerWindow");
+			return result;
+		}
+
+		public static IntPtr DuplicateWindow(IntPtr window)
+		{
+			IntPtr result = dupwin(window);
+			InternalException.Verify(result, "DuplicateWindow");
+			return result;
 		}
 
 		public static void Echo()
@@ -351,6 +379,18 @@ namespace csharpncurses
 			InternalException.Verify(result, "NoEcho");
 		}
 
+		public static void Overlay(IntPtr sourceWindow, IntPtr destinationWindow)
+		{
+			int result = overlay(sourceWindow, destinationWindow);
+			InternalException.Verify(result, "Overlay");
+		}
+
+		public static void Overwrite(IntPtr sourceWindow, IntPtr destinationWindow)
+		{
+			int result = overwrite(sourceWindow, destinationWindow);
+			InternalException.Verify(result, "Overwrite");
+		}
+
 		public static void PairContent(short pair, out short fg, out short bg)
 		{
 			int result = pair_content(pair, out fg, out bg);
@@ -360,12 +400,6 @@ namespace csharpncurses
 		public static short PairNumber(uint pairNumber)
 		{
 			return PAIR_NUMBER(pairNumber);
-		}
-
-		public static void StartColor()
-		{
-			int result = start_color();
-			InternalException.Verify(result, "StartColour");
 		}
 
 		public static int Refresh()
@@ -379,6 +413,19 @@ namespace csharpncurses
 		{
 			int ret = resize_term(numberOfLines, numberOfColumns);
 			InternalException.Verify(ret, "ResizeTerminal");
+		}
+
+		public static void StartColor()
+		{
+			int result = start_color();
+			InternalException.Verify(result, "StartColour");
+		}
+
+		public static IntPtr SubWindow(IntPtr window, int rows, int columns, int y, int x)
+		{
+			IntPtr result = subwin(window, rows, columns, y, x);
+			InternalException.Verify(result, "SubWindow");
+			return result;
 		}
 
 		public static int TouchWindow(IntPtr window)
@@ -410,6 +457,13 @@ namespace csharpncurses
 		{
 			int result = wbkgd(window, ch);
 			InternalException.Verify(result, "WindowBackground");
+		}
+
+		public static int WGetChar(IntPtr window)
+		{
+			int result = wgetch(window);
+			InternalException.Verify(result, "WGetChar");
+			return result;
 		}
 
 		public static int WRefresh(IntPtr window)
@@ -461,6 +515,10 @@ namespace csharpncurses
 		private static extern int color_content(short color, out short red, out short green, out short blue);
 
 		[DllImport(cursesLib)]
+		private static extern int copywin(IntPtr sourceWindow, IntPtr destinationWindow, int sourceRow, int sourceColumn,
+		                                  int destinationRow, int destinationColumn, int dxRow, int dxColumn, int type);
+
+		[DllImport(cursesLib)]
 		private static extern int clrtobot();
 
 		[DllImport(cursesLib)]
@@ -474,6 +532,13 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int delwin(IntPtr window);
+
+		[DllImport(cursesLib)]
+		private static extern IntPtr derwin(IntPtr window, int rows, int columns, int y, int x);
+		/* implemented */
+
+		[DllImport(cursesLib)]
+		private static extern IntPtr dupwin(IntPtr window);
 
 		[DllImport(cursesLib)]
 		private static extern int echo();
@@ -569,6 +634,12 @@ namespace csharpncurses
 		private static extern int noecho();
 
 		[DllImport(cursesLib)]
+		private static extern int overlay(IntPtr sourceWindow, IntPtr destinationWindow);
+
+		[DllImport(cursesLib)]
+		private static extern int overwrite(IntPtr sourceWindow, IntPtr destinationWindow);
+
+		[DllImport(cursesLib)]
 		private static extern int pair_content(short pair, out short fg, out short bg);
 
 		[DllImport(cursesLib)]
@@ -579,6 +650,10 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int start_color();
+
+		[DllImport(cursesLib)]
+		private static extern IntPtr subwin(IntPtr window, int rows, int colums, int y, int x);
+		/* implemented */
 
 		[DllImport(cursesLib)]
 		private static extern int touchwin(IntPtr window);
@@ -596,10 +671,16 @@ namespace csharpncurses
 		private static extern int waddnstr(IntPtr win, String str, int n);
 
 		[DllImport(cursesLib)]
-		private static extern int wrefresh(IntPtr win);
+		private static extern int wbkgd(IntPtr window, uint ch);
 
 		[DllImport(cursesLib)]
-		private static extern int wbkgd(IntPtr window, uint ch);
+		private static extern int wclear(IntPtr window);
+
+		[DllImport(cursesLib)]
+		private static extern int wgetch(IntPtr win);
+
+		[DllImport(cursesLib)]
+		private static extern int wrefresh(IntPtr win);
 
 	}
 }
