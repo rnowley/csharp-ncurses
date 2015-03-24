@@ -173,11 +173,24 @@ namespace csharpncurses
 			return COLOR_PAIR(pairNumber);
 		}
 
+		/// <summary>
+		/// Copies a chunk of text from one window to another window.
+		/// </summary>
+		/// <param name="sourceWindow">Source window.</param>
+		/// <param name="destinationWindow">Destination window.</param>
+		/// <param name="sourceRow">The starting row of the text to be copied.</param>
+		/// <param name="sourceColumn">The starting column of the text to be copied.</param>
+		/// <param name="destinationRow">The starting row that the text will be copied to.</param>
+		/// <param name="destinationColumn">The starting column that the text will be copied to.</param>
+		/// <param name="rowOffset">The number of rows of the chunk to be copied.</param>
+		/// <param name="columnOffset">The numbe rof columns of the chunk to be copied.</param>
+		/// <param name="type">If set to <c>true</c> the the text is copied non-destructively and overlays the 
+		/// the existing text. If set to <c>false</c> then the text block replaces the original text.</param>
 		public static void CopyWindow(IntPtr sourceWindow, IntPtr destinationWindow, int sourceRow, int sourceColumn,
-		                              int destinationRow, int destinationColumn, int dxRow, int dxColumn, int type)
+		                              int destinationRow, int destinationColumn, int rowOffset, int columnOffset, bool type)
 		{
 			int result = copywin(sourceWindow, destinationWindow, sourceRow, sourceColumn, destinationRow,
-				             destinationColumn, dxRow, dxColumn, type);
+				             destinationColumn, rowOffset, columnOffset, type);
 			InternalException.Verify(result, "CopyWindow");
 		}
 
@@ -353,10 +366,23 @@ namespace csharpncurses
 			return result;
 		}
 
+		public static void MoveWindow(IntPtr window, int row, int column)
+		{
+			int result = mvwin(window, row, column);
+			InternalException.Verify(result, "MoveWindow");
+		}
+
 		public static int NapMilliseconds(int milliseconds)
 		{
 			int result = napms(milliseconds);
 			InternalException.Verify(result, "NapMilliseconds");
+			return result;
+		}
+
+		public static IntPtr NewPad(int row, int column)
+		{
+			IntPtr result = newpad(row, column);
+			InternalException.Verify(result, "NewPad");
 			return result;
 		}
 
@@ -385,10 +411,18 @@ namespace csharpncurses
 			InternalException.Verify(result, "Overlay");
 		}
 
-		public static void Overwrite(IntPtr sourceWindow, IntPtr destinationWindow)
+		public static void OverWrite(IntPtr sourceWindow, IntPtr destinationWindow)
 		{
 			int result = overwrite(sourceWindow, destinationWindow);
 			InternalException.Verify(result, "Overwrite");
+		}
+
+		public static void PadRefresh(IntPtr pad, int padMinRow, int padMinColumn, int screenMinRow,
+		                              int screenMinColumn, int screenMaxRow, int screenMaxColumn)
+		{
+			int result = prefresh(pad, padMinRow, padMinColumn, screenMinRow, screenMinColumn,
+				             screenMaxRow, screenMaxColumn);
+			InternalException.Verify(result, "PadRefresh");
 		}
 
 		public static void PairContent(short pair, out short fg, out short bg)
@@ -415,6 +449,24 @@ namespace csharpncurses
 			InternalException.Verify(ret, "ResizeTerminal");
 		}
 
+		public static void ScrollNLines(int numberOfLines)
+		{
+			int result = scrl(numberOfLines);
+			InternalException.Verify(result, "NumberOfLInes");
+		}
+
+		public static void Scroll(IntPtr window)
+		{
+			int result = scroll(window);
+			InternalException.Verify(result, "Scroll");
+		}
+
+		public static void ScrollOk(IntPtr window, bool canScroll)
+		{
+			int result = scrollok(window, canScroll);
+			InternalException.Verify(result, "ScrollOk");
+		}
+
 		public static void StartColor()
 		{
 			int result = start_color();
@@ -426,6 +478,12 @@ namespace csharpncurses
 			IntPtr result = subwin(window, rows, columns, y, x);
 			InternalException.Verify(result, "SubWindow");
 			return result;
+		}
+
+		public static void TouchLine(IntPtr window, int row, int column)
+		{
+			int result = touchline(window, row, column);
+			InternalException.Verify(result, "TouchLine");
 		}
 
 		public static int TouchWindow(IntPtr window)
@@ -473,6 +531,12 @@ namespace csharpncurses
 			return result;
 		}
 
+		public static void WScrollNLines(IntPtr window, int numberOfLines)
+		{
+			int result = wscrl(window, numberOfLines);
+			InternalException.Verify(result, "WScrollNLInes");
+		}
+
 		// ------------------------------------
 
 		[DllImport(cursesLib)]
@@ -516,7 +580,7 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int copywin(IntPtr sourceWindow, IntPtr destinationWindow, int sourceRow, int sourceColumn,
-		                                  int destinationRow, int destinationColumn, int dxRow, int dxColumn, int type);
+		                                  int destinationRow, int destinationColumn, int rowOffset, int columnOffset, bool type);
 
 		[DllImport(cursesLib)]
 		private static extern int clrtobot();
@@ -622,7 +686,13 @@ namespace csharpncurses
 		private static extern int mvwaddstr(IntPtr window, int y, int x, string message);
 
 		[DllImport(cursesLib)]
+		private static extern int mvwin(IntPtr window, int row, int column);
+
+		[DllImport(cursesLib)]
 		private static extern int napms(int milliseconds);
+
+		[DllImport(cursesLib)]
+		private static extern IntPtr newpad(int row, int column);
 
 		[DllImport(cursesLib)]
 		private static extern IntPtr newwin(int rows, int columns, int yOrigin, int xOrigin);
@@ -643,10 +713,23 @@ namespace csharpncurses
 		private static extern int pair_content(short pair, out short fg, out short bg);
 
 		[DllImport(cursesLib)]
+		private static extern int prefresh(IntPtr pad, int padMinRow, int padMinColumn, int screenMinRow,
+		                                   int screenMinColumn, int screenMaxRow, int screenMaxColumn);
+
+		[DllImport(cursesLib)]
 		private static extern int refresh();
 
 		[DllImport(cursesLib)]
 		private static extern int resize_term(int nlines, int ncols);
+
+		[DllImport(cursesLib)]
+		private static extern int scrl(int numberOfLines);
+
+		[DllImport(cursesLib)]
+		private static extern int scroll(IntPtr window);
+
+		[DllImport(cursesLib)]
+		private static extern int scrollok(IntPtr window, bool canScroll);
 
 		[DllImport(cursesLib)]
 		private static extern int start_color();
@@ -654,6 +737,9 @@ namespace csharpncurses
 		[DllImport(cursesLib)]
 		private static extern IntPtr subwin(IntPtr window, int rows, int colums, int y, int x);
 		/* implemented */
+
+		[DllImport(cursesLib)]
+		private static extern int touchline(IntPtr window, int row, int column);
 
 		[DllImport(cursesLib)]
 		private static extern int touchwin(IntPtr window);
@@ -681,6 +767,9 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int wrefresh(IntPtr win);
+
+		[DllImport(cursesLib)]
+		private static extern int wscrl(IntPtr window, int numberOfLines);
 
 	}
 }
