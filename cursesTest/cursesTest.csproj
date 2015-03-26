@@ -41,4 +41,9 @@
       <Name>csharp-ncurses</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="gettysburg.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

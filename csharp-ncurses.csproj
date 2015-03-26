@@ -35,6 +35,7 @@
     <Compile Include="CursesException.cs" />
     <Compile Include="Internal\InternalException.cs" />
     <Compile Include="Internal\NCurses.cs" />
+    <Compile Include="Internal\MouseEvent.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

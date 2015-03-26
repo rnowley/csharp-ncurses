@@ -4,13 +4,20 @@ using System.Text;
 
 namespace csharpncurses
 {
-	public enum NCursesStatus: int
+	public enum NCursesStatusEnum: int
 	{
 		ERROR = -1,
 		OK = 1
 	}
 
-	public enum KeyCodes: int
+	public enum SoftLabelPositionEnum: int
+	{
+		LEFT,
+		CENTER,
+		RIGHT
+	}
+
+	public enum KeyCodesEnum: int
 	{
 		KEY_CODE_YES = 256,
 		KEY_MIN,
@@ -45,7 +52,7 @@ namespace csharpncurses
 		KEY_EOS
 	}
 
-	public enum NCursesColor: short
+	public enum NCursesColorEnum: short
 	{
 		BLACK = 0,
 		RED,
@@ -55,6 +62,37 @@ namespace csharpncurses
 		MAGENTA,
 		CYAN,
 		WHITE
+	}
+
+	public enum MouseEventEnum: long
+	{
+		BUTTON1_RELEASED = 1,
+		BUTTON1_PRESSED,
+		BUTTON1_CLICKED = 4,
+		BUTTON1_DOUBLE_CLICKED = 8,
+		BUTTON1_TRIPLE_CLICKED = 16,
+		BUTTON2_RELEASED = 64,
+		BUTTON2_PRESSED = 128,
+		BUTTON2_CLICKED = 256,
+		BUTTON2_DOUBLE_CLICKED = 512,
+		BUTTON2_TRIPLE_CLICKED = 1024,
+		BUTTON3_RELEASED = 4096,
+		BUTTON3_DOUBLE_CLICKED = 32768,
+		BUTTON3_TRIPLE_CLICKED = 65536,
+		BUTTON4_RELEASED = 262144,
+		BUTTON4_PRESSED = 524288,
+		BUTTON4_CLICKED = 1048576,
+		BUTTON4_DOUBLE_CLICKED = 2097152,
+		BUTTON4_TRIPLE_CLICKED = 4194304,
+		BUTTON1_RESERVED_EVENT = 32,
+		BUTTON2_RESERVED_EVENT = 2048,
+		BUTTON3_RESERVED_EVENT = 131072,
+		BUTTON4_RESERVED_EVENT = 8388608,
+		BUTTON_CTRL = 16777216,
+		BUTTON_SHIFT = 33554432,
+		BUTTON_ALT = 67108864,
+		REPORT_MOUSE_POSITION = 134217728,
+		ALL_MOUSE_EVENTS = 134217727
 	}
 
 	public enum NCursesAttribute: uint
@@ -144,6 +182,12 @@ namespace csharpncurses
 			InternalException.Verify(result, "Clear");
 		}
 
+		public static void ClearSoftKeyLabels()
+		{
+			int result = slk_clear();
+			InternalException.Verify(result, "ClearSoftKeyLabels");
+		}
+
 		public static void ClearToEndOfLine()
 		{
 			int result = clrtoeol();
@@ -206,10 +250,10 @@ namespace csharpncurses
 			InternalException.Verify(result, "DeleteLine");
 		}
 
-		public static void DeleteWindow(IntPtr window)
+		public static int DeleteWindow(IntPtr window)
 		{
 			int result = delwin(window);
-			InternalException.Verify(result, "DeleteWindow");
+			return result;
 		}
 
 		public static IntPtr DerWindow(IntPtr window, int rows, int columns, int y, int x)
@@ -217,6 +261,12 @@ namespace csharpncurses
 			IntPtr result = derwin(window, rows, columns, y, x);
 			InternalException.Verify(result, "DerWindow");
 			return result;
+		}
+
+		public static void DoUpdate()
+		{
+			int result = doupdate();
+			InternalException.Verify(result, "DoUpdate");
 		}
 
 		public static IntPtr DuplicateWindow(IntPtr window)
@@ -327,6 +377,17 @@ namespace csharpncurses
 			InternalException.Verify(result, "InsertLine");
 		}
 
+		/// <summary>
+		/// Initialises the specified number of soft labels.
+		/// </summary>
+		/// <param name="numberOfLabels">Number of soft key labels to create.</param>
+		/// <remarks>This method must be called before <see cref="InitScreen"/></remarks>
+		public static void InitSoftKeyLabels(int numberOfLabels)
+		{
+			int result = slk_init(numberOfLabels);
+			InternalException.Verify(result, "InitSoftLabelKeys");
+		}
+
 		public static bool IsEndWin()
 		{
 			return isendwin();
@@ -417,6 +478,16 @@ namespace csharpncurses
 			InternalException.Verify(result, "Overwrite");
 		}
 
+
+
+		public static void PadNOutRefresh(IntPtr pad, int padMinRow, int padMinColumn, int screenMinRow,
+		                                  int screenMinColumn, int screenMaxRow, int screenMaxColumn)
+		{
+			int result = pnoutrefresh(pad, padMinRow, padMinColumn, screenMinRow, screenMinColumn,
+				             screenMaxRow, screenMaxColumn);
+			InternalException.Verify(result, "PadNOutRefresh");
+		}
+
 		public static void PadRefresh(IntPtr pad, int padMinRow, int padMinColumn, int screenMinRow,
 		                              int screenMinColumn, int screenMaxRow, int screenMaxColumn)
 		{
@@ -431,6 +502,13 @@ namespace csharpncurses
 			InternalException.Verify(result, "PairContent");
 		}
 
+		public static int PadEchoChar(IntPtr pad, int character)
+		{
+			int result = pechochar(pad, character);
+			InternalException.Verify(result, "PadEchoChar");
+			return result;
+		}
+
 		public static short PairNumber(uint pairNumber)
 		{
 			return PAIR_NUMBER(pairNumber);
@@ -443,10 +521,22 @@ namespace csharpncurses
 			return ret;
 		}
 
+		public static void RefreshSoftKeyLabels()
+		{
+			int result = slk_refresh();
+			InternalException.Verify(result, "RefreshSoftKeyLabels");
+		}
+
 		public static void ResizeTerminal(int numberOfLines, int numberOfColumns)
 		{
 			int ret = resize_term(numberOfLines, numberOfColumns);
 			InternalException.Verify(ret, "ResizeTerminal");
+		}
+
+		public static void RestoreSoftKeyLabels()
+		{
+			int result = slk_restore();
+			InternalException.Verify(result, "RestoreSoftKeyLabels");
 		}
 
 		public static void ScrollNLines(int numberOfLines)
@@ -467,15 +557,41 @@ namespace csharpncurses
 			InternalException.Verify(result, "ScrollOk");
 		}
 
+
+
+
+
+		public static void SetSoftKeyLabel(int labelNumber, string text, SoftLabelPositionEnum position)
+		{
+			int result = slk_set(labelNumber, text, (int)position);
+			InternalException.Verify(result, "SetSoftKeyLabel");
+		}
+
 		public static void StartColor()
 		{
 			int result = start_color();
 			InternalException.Verify(result, "StartColour");
 		}
 
-		public static IntPtr SubWindow(IntPtr window, int rows, int columns, int y, int x)
+		/// <summary>
+		/// Creates a new subpad.
+		/// </summary>
+		/// <returns>A new subpad that belongs to the specified pad.</returns>
+		/// <param name="parent">The parent pad that the sub pad belongs to.</param>
+		/// <param name="rows">The number of rows that the subpad is to have.</param>
+		/// <param name="columns">The number of columns that the subpad is to have.</param>
+		/// <param name="y">The y coordinate relative to the parent.</param>
+		/// <param name="x">The x coordinate relative to the parent.</param>
+		public static IntPtr SubPad(IntPtr parent, int rows, int columns, int y, int x)
 		{
-			IntPtr result = subwin(window, rows, columns, y, x);
+			IntPtr result = subpad(parent, rows, columns, y, x);
+			InternalException.Verify(result, "SubPad");
+			return result;
+		}
+
+		public static IntPtr SubWindow(IntPtr parent, int rows, int columns, int y, int x)
+		{
+			IntPtr result = subwin(parent, rows, columns, y, x);
 			InternalException.Verify(result, "SubWindow");
 			return result;
 		}
@@ -502,6 +618,13 @@ namespace csharpncurses
 		{
 			int result = use_default_colors();
 			InternalException.Verify(result, "UseDefaultColors");
+		}
+
+		public static int WAddChar(IntPtr window, int character)
+		{
+			int result = waddch(window, character);
+			InternalException.Verify(result, "WAddChar");
+			return result;
 		}
 
 		public static int WAddStr(IntPtr window, string message)
@@ -599,7 +722,9 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern IntPtr derwin(IntPtr window, int rows, int columns, int y, int x);
-		/* implemented */
+
+		[DllImport(cursesLib)]
+		private static extern int doupdate();
 
 		[DllImport(cursesLib)]
 		private static extern IntPtr dupwin(IntPtr window);
@@ -665,6 +790,9 @@ namespace csharpncurses
 		private static extern int keypad(IntPtr window, bool enable);
 
 		[DllImport(cursesLib)]
+		private static extern long mousemask(long newMask, long? oldmask);
+
+		[DllImport(cursesLib)]
 		private static extern int move(int y, int x);
 
 		[DllImport(cursesLib)]
@@ -713,6 +841,13 @@ namespace csharpncurses
 		private static extern int pair_content(short pair, out short fg, out short bg);
 
 		[DllImport(cursesLib)]
+		private static extern int pechochar(IntPtr pad, int character);
+
+		[DllImport(cursesLib)]
+		private static extern int pnoutrefresh(IntPtr pad, int padMinRow, int padMinColumn, int screenMinRow,
+		                                       int screenMinColumn, int screenMaxRow, int screenMaxColumn);
+
+		[DllImport(cursesLib)]
 		private static extern int prefresh(IntPtr pad, int padMinRow, int padMinColumn, int screenMinRow,
 		                                   int screenMinColumn, int screenMaxRow, int screenMaxColumn);
 
@@ -732,11 +867,28 @@ namespace csharpncurses
 		private static extern int scrollok(IntPtr window, bool canScroll);
 
 		[DllImport(cursesLib)]
+		private static extern int slk_clear();
+
+		[DllImport(cursesLib)]
+		private static extern int slk_init(int numberOfLabels);
+
+		[DllImport(cursesLib)]
+		private static extern int slk_refresh();
+
+		[DllImport(cursesLib)]
+		private static extern int slk_restore();
+
+		[DllImport(cursesLib)]
+		private static extern int slk_set(int labelNumber, string text, int position);
+
+		[DllImport(cursesLib)]
 		private static extern int start_color();
 
 		[DllImport(cursesLib)]
+		private static extern IntPtr subpad(IntPtr parent, int row, int column, int y, int x);
+
+		[DllImport(cursesLib)]
 		private static extern IntPtr subwin(IntPtr window, int rows, int colums, int y, int x);
-		/* implemented */
 
 		[DllImport(cursesLib)]
 		private static extern int touchline(IntPtr window, int row, int column);
@@ -749,6 +901,9 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int use_default_colors();
+
+		[DllImport(cursesLib)]
+		private static extern int waddch(IntPtr window, int character);
 
 		[DllImport(cursesLib, CharSet = CharSet.Ansi)]
 		private static extern int waddstr(IntPtr window, string message);
