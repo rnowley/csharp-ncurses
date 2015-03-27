@@ -1,23 +1,25 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace csharpncurses
 {
-	public class MouseEvent
+	[StructLayout(LayoutKind.Sequential)]
+	public unsafe struct MouseEvent
 	{
-		private short _id;
-		private int _x;
-		private int _y;
-		private int _z;
-		private long _buttonState;
+		[MarshalAs(UnmanagedType.I2)]
+		public short id;
 
-		public MouseEvent(short id, int x, int y, int z, long buttonState)
-		{
-			_id = id;
-			_x = x;
-			_y = y;
-			_z = z;
-			_buttonState = buttonState;
-		}
+		[MarshalAs(UnmanagedType.I4)]
+		public int x;
+
+		[MarshalAs(UnmanagedType.I4)]
+		public int y;
+
+		[MarshalAs(UnmanagedType.I4)]
+		public int z;
+
+		[MarshalAs(UnmanagedType.I8)]
+		public long bstate;
 	}
 }
 

@@ -8,78 +8,25 @@ namespace cursesTest
 
 		public static void Main(string[] args)
 		{
-			string[] labelText = { 
-				"I", "AM", "SAM", "DO", "NOT", "LIKE", "THAT", "SAY",
-				"WOULD", "COULD", "YOU", "GREEN EGGS AND HAM"
-			};
+			IntPtr stdscr = NCurses.InitScreen();
 
-			NCurses.InitSoftKeyLabels(2);
-			IntPtr stdcr = NCurses.InitScreen();
-			NCurses.NoEcho();
-			NCurses.Keypad(stdcr, true);
-
-			for(int label = 0; label < labelText.Length; ++label) {
-				NCurses.SetSoftKeyLabel(label + 1, labelText[label], SoftLabelPositionEnum.CENTER);
-			}
-
-			NCurses.RefreshSoftKeyLabels();
-			NCurses.AddStr("Use the function keys to type.\n");
-			NCurses.AddStr("Press '?' or '!' or '.' to end a line.\n");
-			NCurses.AddStr("Press Enter to quit.\n\n");
+			NCurses.SetCursor(CursorStateEnum.INVISIBLE);
+			NCurses.AddStr("  <- The cursor has been turned off");
+			NCurses.Move(0, 0);
 			NCurses.Refresh();
+			NCurses.GetChar();
 
-			int character;
+			NCurses.SetCursor(CursorStateEnum.NORMAL);
+			NCurses.AddStr("\n  <- The cursor now on");
+			NCurses.Move(1, 0);
+			NCurses.Refresh();
+			NCurses.GetChar();
 
-			while((character = NCurses.GetChar()) != '\n') {
-
-				switch(character) {
-				case '?':
-				case '!':
-				case '.':
-					NCurses.AddChar(character);
-					NCurses.AddChar('\n');
-					break;
-				case (int)KeyCodesEnum.KEY_F1:
-					NCurses.AddStr(string.Format("{0} ", labelText[0]));
-					break;
-				case (int)KeyCodesEnum.KEY_F2:
-					NCurses.AddStr(string.Format("{0} ", labelText[1]));
-					break;
-				case (int)KeyCodesEnum.KEY_F3:
-					NCurses.AddStr(string.Format("{0} ", labelText[2]));
-					break;
-				case (int)KeyCodesEnum.KEY_F4:
-					NCurses.AddStr(string.Format("{0} ", labelText[3]));
-					break;
-				case (int)KeyCodesEnum.KEY_F5:
-					NCurses.AddStr(string.Format("{0} ", labelText[4]));
-					break;
-				case (int)KeyCodesEnum.KEY_F6:
-					NCurses.AddStr(string.Format("{0} ", labelText[5]));
-					break;
-				case (int)KeyCodesEnum.KEY_F7:
-					NCurses.AddStr(string.Format("{0} ", labelText[6]));
-					break;
-				case (int)KeyCodesEnum.KEY_F8:
-					NCurses.AddStr(string.Format("{0} ", labelText[7]));
-					break;
-				case (int)KeyCodesEnum.KEY_F9:
-					NCurses.AddStr(string.Format("{0} ", labelText[8]));
-					break;
-				case (int)KeyCodesEnum.KEY_F10:
-					NCurses.AddStr(string.Format("{0} ", labelText[9]));
-					break;
-				case (int)KeyCodesEnum.KEY_F11:
-					NCurses.AddStr(string.Format("{0} ", labelText[10]));
-					break;
-				case (int)KeyCodesEnum.KEY_F12:
-					NCurses.AddStr(string.Format("{0} ", labelText[11]));
-					break;
-				default:
-					break;
-				}
-					
-			}
+			NCurses.SetCursor(CursorStateEnum.VERY_VISIBLE);
+			NCurses.AddStr("\n  <- Yhe cursor is now very on");
+			NCurses.Move(2, 0);
+			NCurses.Refresh();
+			NCurses.GetChar();
 
 			NCurses.EndWin();
 		}

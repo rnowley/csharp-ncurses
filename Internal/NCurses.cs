@@ -4,6 +4,13 @@ using System.Text;
 
 namespace csharpncurses
 {
+	public enum CursorStateEnum: int
+	{
+		INVISIBLE = 0,
+		NORMAL,
+		VERY_VISIBLE
+	}
+
 	public enum NCursesStatusEnum: int
 	{
 		ERROR = -1,
@@ -49,7 +56,8 @@ namespace csharpncurses
 		KEY_IC,
 		KEY_EIC,
 		KEY_CLEAR,
-		KEY_EOS
+		KEY_EOS,
+		KEY_MOUSE = 409
 	}
 
 	public enum NCursesColorEnum: short
@@ -169,6 +177,12 @@ namespace csharpncurses
 		{
 			int result = beep();
 			InternalException.Verify(result, "Beep");
+		}
+
+		public static void Box(IntPtr window, char verticalChar, char horizontalChar)
+		{
+			int result = box(window, verticalChar, horizontalChar);
+			InternalException.Verify(result, "Box");
 		}
 
 		public static bool CanChangeColor()
@@ -320,6 +334,12 @@ namespace csharpncurses
 			InternalException.Verify(x, "GetMaxYX");
 		}
 
+		public static void GetMouse(out MouseEvent mouseEvent)
+		{
+			int result = getmouse(out mouseEvent);
+			InternalException.Verify(result, "GetMouse");
+		}
+
 		public static void GetNString(StringBuilder message, int numberOfCharacters)
 		{
 			int result = getnstr(message, numberOfCharacters);
@@ -397,6 +417,11 @@ namespace csharpncurses
 		{
 			int result = keypad(window, enable);
 			InternalException.Verify(result, "Keypad");
+		}
+
+		public static long MouseMask(long newMask, out long oldMask)
+		{
+			return mousemask(newMask, out oldMask);
 		}
 
 		public static int Move(int y, int x)
@@ -557,7 +582,11 @@ namespace csharpncurses
 			InternalException.Verify(result, "ScrollOk");
 		}
 
-
+		public static int SetCursor(CursorStateEnum cursorState)
+		{
+			int result = curs_set((int)cursorState);
+			return result;
+		}
 
 
 
@@ -640,6 +669,15 @@ namespace csharpncurses
 			InternalException.Verify(result, "WindowBackground");
 		}
 
+		public static void WindowBorder(IntPtr window, char leftSide, char rightSide, char topSide,
+		                                char bottomSide, char topLeftHandCorner, char topRightHandCorner, char bottomLeftHandCorner,
+		                                char bottomRightHandCorner)
+		{
+			int result = wborder(window, leftSide, rightSide, topSide, bottomSide, topLeftHandCorner,
+				             topRightHandCorner, bottomLeftHandCorner, bottomRightHandCorner);
+			InternalException.Verify(result, "WindowBorder");
+		}
+
 		public static int WGetChar(IntPtr window)
 		{
 			int result = wgetch(window);
@@ -691,6 +729,9 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int bkgd(uint ch);
+
+		[DllImport(cursesLib)]
+		private static extern int box(IntPtr window, char verticalChar, char horizontalChar);
 
 		[DllImport(cursesLib)]
 		private static extern Boolean can_change_color();
@@ -760,6 +801,9 @@ namespace csharpncurses
 		private static extern int getmaxy(IntPtr window);
 
 		[DllImport(cursesLib)]
+		private static extern int getmouse(out MouseEvent mouseEvent);
+
+		[DllImport(cursesLib)]
 		private static extern int getnstr(StringBuilder message, int numberOfCharacters);
 
 		[DllImport(cursesLib)]
@@ -790,7 +834,7 @@ namespace csharpncurses
 		private static extern int keypad(IntPtr window, bool enable);
 
 		[DllImport(cursesLib)]
-		private static extern long mousemask(long newMask, long? oldmask);
+		private static extern long mousemask(long newMask, out long oldmask);
 
 		[DllImport(cursesLib)]
 		private static extern int move(int y, int x);
@@ -867,6 +911,9 @@ namespace csharpncurses
 		private static extern int scrollok(IntPtr window, bool canScroll);
 
 		[DllImport(cursesLib)]
+		private static extern int curs_set(int cursorState);
+
+		[DllImport(cursesLib)]
 		private static extern int slk_clear();
 
 		[DllImport(cursesLib)]
@@ -913,6 +960,11 @@ namespace csharpncurses
 
 		[DllImport(cursesLib)]
 		private static extern int wbkgd(IntPtr window, uint ch);
+
+		[DllImport(cursesLib)]
+		private static extern int wborder(IntPtr window, char leftSide, char rightSide, 
+		                                  char topSide, char bottomSide, char topLeftHandCorner, char topRightHandCorner,
+		                                  char bottomLeftHandCorner, char bottomRightHandCorner);
 
 		[DllImport(cursesLib)]
 		private static extern int wclear(IntPtr window);
