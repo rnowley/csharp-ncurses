@@ -1,0 +1,4 @@
+csharp-ncurses/bin/*
+csharp-ncurses/obj/*
+sample/helloWorld/bin/*
+sample/helloWorld/obj/*

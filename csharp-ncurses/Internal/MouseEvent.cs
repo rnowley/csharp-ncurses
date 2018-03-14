@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace csharpncurses
 {
 	[StructLayout(LayoutKind.Sequential)]
-	public unsafe struct MouseEvent
+	public struct MouseEvent
 	{
 		[MarshalAs(UnmanagedType.I2)]
 		public short id;
