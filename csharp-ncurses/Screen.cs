@@ -13,6 +13,14 @@ namespace csharpncurses
             return NativeMethods.endwin();
         }
 
+        public bool HasColours() {
+            return NativeMethods.has_colors();
+        }
+
+        public int MoveCursor(int row, int column) {
+            return NativeMethods.move(row, column);
+        }
+
         public int Refresh() {
             return NativeMethods.refresh();
         }
